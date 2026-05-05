@@ -9,14 +9,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class FirstScreen implements Screen {
+public class InstructionsScreen implements Screen {
 
     private DungeiboneGame game;
     private SpriteBatch batch;
     private BitmapFont font;
     private OrthographicCamera camera;
 
-    public FirstScreen(DungeiboneGame game) {
+    public InstructionsScreen(DungeiboneGame game) {
         this.game = game;
     }
 
@@ -32,7 +32,7 @@ public class FirstScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0.08f, 1);
+        Gdx.gl.glClearColor(0.03f, 0.03f, 0.08f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
@@ -40,34 +40,23 @@ public class FirstScreen implements Screen {
 
         batch.begin();
 
-        font.getData().setScale(3);
-        font.draw(batch, "DUNGEIBONE", 260, 430);
+        font.getData().setScale(2.5f);
+        font.draw(batch, "INSTRUCCIONES", 250, 450);
 
-        font.getData().setScale(1.5f);
-        font.draw(batch, "ENTER - Iniciar partida", 270, 340);
-        font.draw(batch, "I - Instrucciones", 270, 300);
-        font.draw(batch, "O - Opciones", 270, 260);
-        font.draw(batch, "ESC - Salir", 270, 220);
+        font.getData().setScale(1.4f);
+        font.draw(batch, "Muevete con WASD o flechas.", 180, 360);
+        font.draw(batch, "Recoge la llave amarilla.", 180, 320);
+        font.draw(batch, "Llega a la puerta marron para pasar de nivel.", 180, 280);
+        font.draw(batch, "Evita los enemigos: rojo, naranja y morado.", 180, 240);
+        font.draw(batch, "Supera el nivel 2 para ganar.", 180, 200);
 
-        font.getData().setScale(1);
-        font.draw(batch, "Videojuego 2D realizado con libGDX", 285, 150);
+        font.getData().setScale(1.2f);
+        font.draw(batch, "Pulsa ESC para volver al menu", 260, 120);
 
         batch.end();
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            game.setScreen(new GameScreen(game));
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
-            game.setScreen(new InstructionsScreen(game));
-        }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-            game.setScreen(new OptionsScreen(game));
-        }
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            Gdx.app.exit();
+            game.setScreen(new FirstScreen(game));
         }
     }
 
