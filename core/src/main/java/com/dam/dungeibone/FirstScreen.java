@@ -55,7 +55,7 @@ public class FirstScreen implements Screen {
         batch.end();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            System.out.println("Comenzar partida");
+            game.setScreen(new GameScreen(game));
         }
     }
 
