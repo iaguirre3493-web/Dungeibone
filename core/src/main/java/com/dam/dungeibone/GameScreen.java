@@ -1,8 +1,10 @@
+
 package com.dam.dungeibone;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -10,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.audio.Sound;
 
 public class GameScreen implements Screen {
 
@@ -19,6 +20,7 @@ public class GameScreen implements Screen {
     private ShapeRenderer shapeRenderer;
     private SpriteBatch batch;
     private BitmapFont font;
+
     private Sound pickupSound;
     private Sound hitSound;
 
@@ -43,6 +45,8 @@ public class GameScreen implements Screen {
     private boolean keyVisible;
     private float damageCooldown;
 
+    private float animationTime;
+
     public GameScreen(DungeiboneGame game) {
         this.game = game;
     }
@@ -56,11 +60,9 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         font = new BitmapFont();
         font.setColor(Color.WHITE);
+
         pickupSound = Gdx.audio.newSound(Gdx.files.internal("sounds/pickup.wav"));
         hitSound = Gdx.audio.newSound(Gdx.files.internal("sounds/hit.wav"));
-
-        pickupSound.play(1.0f);
-        System.out.println("Prueba de sonido ejecutada");
 
         vida = 100;
         puntos = 0;
@@ -81,6 +83,7 @@ public class GameScreen implements Screen {
 
         patrolDirection = 1;
         damageCooldown = 0;
+        animationTime = 0;
 
         cargarNivel(nivel);
     }
@@ -109,11 +112,11 @@ public class GameScreen implements Screen {
         }
     }
 
-
     @Override
     public void render(float delta) {
         updatePlayer(delta);
         updateEnemies(delta);
+        updateAnimation(delta);
         checkCollisions(delta);
         clearScreen();
         drawGame();
@@ -190,6 +193,25 @@ public class GameScreen implements Screen {
         }
     }
 
+    private void updateAnimation(float delta) {
+        animationTime += delta;
+    }
+
+    private boolean isPlayerMoving() {
+        return Gdx.input.isKeyPressed(Input.Keys.LEFT)
+            || Gdx.input.isKeyPressed(Input.Keys.RIGHT)
+            || Gdx.input.isKeyPressed(Input.Keys.UP)
+            || Gdx.input.isKeyPressed(Input.Keys.DOWN)
+            || Gdx.input.isKeyPressed(Input.Keys.A)
+            || Gdx.input.isKeyPressed(Input.Keys.D)
+            || Gdx.input.isKeyPressed(Input.Keys.W)
+            || Gdx.input.isKeyPressed(Input.Keys.S);
+    }
+
+    private boolean isAnimationFrameActive() {
+        return ((int) (animationTime * 8)) % 2 == 0;
+    }
+
     private void checkCollisions(float delta) {
         damageCooldown -= delta;
 
@@ -244,30 +266,62 @@ public class GameScreen implements Screen {
         camera.update();
         shapeRenderer.setProjectionMatrix(camera.combined);
 
+        boolean frame = isAnimationFrameActive();
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         shapeRenderer.setColor(Color.DARK_GRAY);
         shapeRenderer.rect(0, 0, 800, 600);
 
+        float playerDrawSize = 40;
+
+        if (isPlayerMoving()) {
+            if (frame) {
+                playerDrawSize = 40;
+            } else {
+                playerDrawSize = 34;
+            }
+        }
+
+        float playerOffset = (40 - playerDrawSize) / 2;
+
         shapeRenderer.setColor(Color.GREEN);
-        shapeRenderer.rect(player.x, player.y, player.width, player.height);
+        shapeRenderer.rect(player.x + playerOffset, player.y + playerOffset, playerDrawSize, playerDrawSize);
+
+        shapeRenderer.setColor(Color.BLACK);
+        shapeRenderer.rect(player.x + 9, player.y + 26, 6, 6);
+        shapeRenderer.rect(player.x + 25, player.y + 26, 6, 6);
 
         if (keyVisible) {
-            shapeRenderer.setColor(Color.YELLOW);
+            if (frame) {
+                shapeRenderer.setColor(Color.YELLOW);
+            } else {
+                shapeRenderer.setColor(Color.GOLD);
+            }
+
             shapeRenderer.rect(key.x, key.y, key.width, key.height);
         }
 
         shapeRenderer.setColor(Color.BROWN);
         shapeRenderer.rect(door.x, door.y, door.width, door.height);
 
+        float staticSize = frame ? staticEnemy.width : staticEnemy.width - 4;
+        float staticOffset = (staticEnemy.width - staticSize) / 2;
+
         shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(staticEnemy.x, staticEnemy.y, staticEnemy.width, staticEnemy.height);
+        shapeRenderer.rect(staticEnemy.x + staticOffset, staticEnemy.y + staticOffset, staticSize, staticSize);
+
+        float patrolSize = frame ? patrolEnemy.width : patrolEnemy.width - 6;
+        float patrolOffset = (patrolEnemy.width - patrolSize) / 2;
 
         shapeRenderer.setColor(Color.ORANGE);
-        shapeRenderer.rect(patrolEnemy.x, patrolEnemy.y, patrolEnemy.width, patrolEnemy.height);
+        shapeRenderer.rect(patrolEnemy.x + patrolOffset, patrolEnemy.y + patrolOffset, patrolSize, patrolSize);
+
+        float chaserSize = frame ? chaserEnemy.width : chaserEnemy.width + 5;
+        float chaserOffset = (chaserEnemy.width - chaserSize) / 2;
 
         shapeRenderer.setColor(Color.PURPLE);
-        shapeRenderer.rect(chaserEnemy.x, chaserEnemy.y, chaserEnemy.width, chaserEnemy.height);
+        shapeRenderer.rect(chaserEnemy.x + chaserOffset, chaserEnemy.y + chaserOffset, chaserSize, chaserSize);
 
         shapeRenderer.end();
     }
@@ -276,6 +330,7 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
+
         font.getData().setScale(1.5f);
         font.draw(batch, "Vida: " + vida, 20, 580);
         font.draw(batch, "Puntos: " + puntos, 20, 550);
@@ -290,6 +345,7 @@ public class GameScreen implements Screen {
         font.getData().setScale(1);
         font.draw(batch, "Rojo: estatico | Naranja: patrulla | Morado: perseguidor", 230, 580);
         font.draw(batch, "Objetivo: recoge la llave y llega a la puerta", 280, 555);
+        font.draw(batch, "Animaciones basicas activas", 320, 530);
 
         batch.end();
     }
@@ -315,5 +371,7 @@ public class GameScreen implements Screen {
         shapeRenderer.dispose();
         batch.dispose();
         font.dispose();
+        pickupSound.dispose();
+        hitSound.dispose();
     }
 }
