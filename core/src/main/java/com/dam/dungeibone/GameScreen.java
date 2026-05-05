@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.audio.Sound;
 
 public class GameScreen implements Screen {
 
@@ -18,6 +19,8 @@ public class GameScreen implements Screen {
     private ShapeRenderer shapeRenderer;
     private SpriteBatch batch;
     private BitmapFont font;
+    private Sound pickupSound;
+    private Sound hitSound;
 
     private Rectangle player;
     private Rectangle key;
@@ -53,6 +56,11 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         font = new BitmapFont();
         font.setColor(Color.WHITE);
+        pickupSound = Gdx.audio.newSound(Gdx.files.internal("sounds/pickup.wav"));
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("sounds/hit.wav"));
+
+        pickupSound.play(1.0f);
+        System.out.println("Prueba de sonido ejecutada");
 
         vida = 100;
         puntos = 0;
@@ -189,11 +197,26 @@ public class GameScreen implements Screen {
             keyVisible = false;
             tieneLlave = true;
             puntos += 100;
+
+            if (game.isSonidoActivado()) {
+                pickupSound.play();
+            }
         }
 
         if (player.overlaps(staticEnemy) || player.overlaps(patrolEnemy) || player.overlaps(chaserEnemy)) {
             if (damageCooldown <= 0) {
-                vida -= 10;
+                if (game.getDificultad().equals("FACIL")) {
+                    vida -= 5;
+                } else if (game.getDificultad().equals("NORMAL")) {
+                    vida -= 10;
+                } else {
+                    vida -= 15;
+                }
+
+                if (game.isSonidoActivado()) {
+                    hitSound.play();
+                }
+
                 damageCooldown = 1;
             }
         }
