@@ -6,6 +6,8 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class GameScreen implements Screen {
@@ -13,11 +15,17 @@ public class GameScreen implements Screen {
     private DungeiboneGame game;
     private OrthographicCamera camera;
     private ShapeRenderer shapeRenderer;
+    private SpriteBatch batch;
+    private BitmapFont font;
 
     private float playerX;
     private float playerY;
     private float playerSize;
     private float playerSpeed;
+
+    private int vida;
+    private int puntos;
+    private int nivel;
 
     public GameScreen(DungeiboneGame game) {
         this.game = game;
@@ -29,11 +37,18 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false, 800, 600);
 
         shapeRenderer = new ShapeRenderer();
+        batch = new SpriteBatch();
+        font = new BitmapFont();
+        font.setColor(Color.WHITE);
 
         playerX = 400;
         playerY = 300;
         playerSize = 40;
         playerSpeed = 220;
+
+        vida = 100;
+        puntos = 0;
+        nivel = 1;
     }
 
     @Override
@@ -41,6 +56,7 @@ public class GameScreen implements Screen {
         updatePlayer(delta);
         clearScreen();
         drawPlayer();
+        drawHUD();
     }
 
     private void updatePlayer(float delta) {
@@ -92,6 +108,17 @@ public class GameScreen implements Screen {
         shapeRenderer.end();
     }
 
+    private void drawHUD() {
+        batch.setProjectionMatrix(camera.combined);
+
+        batch.begin();
+        font.getData().setScale(1.5f);
+        font.draw(batch, "Vida: " + vida, 20, 580);
+        font.draw(batch, "Puntos: " + puntos, 20, 550);
+        font.draw(batch, "Nivel: " + nivel, 20, 520);
+        batch.end();
+    }
+
     @Override
     public void resize(int width, int height) {
     }
@@ -111,5 +138,7 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         shapeRenderer.dispose();
+        batch.dispose();
+        font.dispose();
     }
 }
