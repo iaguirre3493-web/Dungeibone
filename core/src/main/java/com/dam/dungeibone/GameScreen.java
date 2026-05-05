@@ -23,7 +23,14 @@ public class GameScreen implements Screen {
     private Rectangle key;
     private Rectangle door;
 
+    private Rectangle staticEnemy;
+    private Rectangle patrolEnemy;
+    private Rectangle chaserEnemy;
+
     private float playerSpeed;
+    private float patrolSpeed;
+    private float chaserSpeed;
+    private int patrolDirection;
 
     private int vida;
     private int puntos;
@@ -31,6 +38,7 @@ public class GameScreen implements Screen {
 
     private boolean tieneLlave;
     private boolean keyVisible;
+    private float damageCooldown;
 
     public GameScreen(DungeiboneGame game) {
         this.game = game;
@@ -50,6 +58,10 @@ public class GameScreen implements Screen {
         puntos = 0;
         nivel = 1;
         playerSpeed = 220;
+        patrolSpeed = 140;
+        chaserSpeed = 90;
+        patrolDirection = 1;
+        damageCooldown = 0;
 
         cargarNivel(nivel);
     }
@@ -57,22 +69,32 @@ public class GameScreen implements Screen {
     private void cargarNivel(int numeroNivel) {
         tieneLlave = false;
         keyVisible = true;
+        damageCooldown = 0;
 
         player = new Rectangle(60, 60, 40, 40);
 
         if (numeroNivel == 1) {
             key = new Rectangle(360, 300, 25, 25);
             door = new Rectangle(700, 500, 50, 70);
+
+            staticEnemy = new Rectangle(250, 180, 40, 40);
+            patrolEnemy = new Rectangle(420, 420, 40, 40);
+            chaserEnemy = new Rectangle(620, 160, 40, 40);
         } else {
             key = new Rectangle(650, 100, 25, 25);
             door = new Rectangle(700, 500, 50, 70);
+
+            staticEnemy = new Rectangle(300, 300, 40, 40);
+            patrolEnemy = new Rectangle(150, 450, 40, 40);
+            chaserEnemy = new Rectangle(600, 350, 40, 40);
         }
     }
 
     @Override
     public void render(float delta) {
         updatePlayer(delta);
-        checkCollisions();
+        updateEnemies(delta);
+        checkCollisions(delta);
         clearScreen();
         drawGame();
         drawHUD();
@@ -112,11 +134,52 @@ public class GameScreen implements Screen {
         }
     }
 
-    private void checkCollisions() {
+    private void updateEnemies(float delta) {
+        patrolEnemy.x += patrolSpeed * patrolDirection * delta;
+
+        if (patrolEnemy.x < 100) {
+            patrolDirection = 1;
+        }
+
+        if (patrolEnemy.x > 650) {
+            patrolDirection = -1;
+        }
+
+        if (chaserEnemy.x < player.x) {
+            chaserEnemy.x += chaserSpeed * delta;
+        }
+
+        if (chaserEnemy.x > player.x) {
+            chaserEnemy.x -= chaserSpeed * delta;
+        }
+
+        if (chaserEnemy.y < player.y) {
+            chaserEnemy.y += chaserSpeed * delta;
+        }
+
+        if (chaserEnemy.y > player.y) {
+            chaserEnemy.y -= chaserSpeed * delta;
+        }
+    }
+
+    private void checkCollisions(float delta) {
+        damageCooldown -= delta;
+
         if (keyVisible && player.overlaps(key)) {
             keyVisible = false;
             tieneLlave = true;
             puntos += 100;
+        }
+
+        if (player.overlaps(staticEnemy) || player.overlaps(patrolEnemy) || player.overlaps(chaserEnemy)) {
+            if (damageCooldown <= 0) {
+                vida -= 10;
+                damageCooldown = 1;
+            }
+        }
+
+        if (vida <= 0) {
+            game.setScreen(new GameOverScreen(game, puntos));
         }
 
         if (player.overlaps(door) && tieneLlave) {
@@ -154,6 +217,15 @@ public class GameScreen implements Screen {
         shapeRenderer.setColor(Color.BROWN);
         shapeRenderer.rect(door.x, door.y, door.width, door.height);
 
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.rect(staticEnemy.x, staticEnemy.y, staticEnemy.width, staticEnemy.height);
+
+        shapeRenderer.setColor(Color.ORANGE);
+        shapeRenderer.rect(patrolEnemy.x, patrolEnemy.y, patrolEnemy.width, patrolEnemy.height);
+
+        shapeRenderer.setColor(Color.PURPLE);
+        shapeRenderer.rect(chaserEnemy.x, chaserEnemy.y, chaserEnemy.width, chaserEnemy.height);
+
         shapeRenderer.end();
     }
 
@@ -173,7 +245,8 @@ public class GameScreen implements Screen {
         }
 
         font.getData().setScale(1);
-        font.draw(batch, "Objetivo: recoge la llave y llega a la puerta", 250, 580);
+        font.draw(batch, "Rojo: estatico | Naranja: patrulla | Morado: perseguidor", 230, 580);
+        font.draw(batch, "Objetivo: recoge la llave y llega a la puerta", 280, 555);
 
         batch.end();
     }
