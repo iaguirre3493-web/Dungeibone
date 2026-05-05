@@ -44,13 +44,27 @@ public class OptionsScreen implements Screen {
         font.draw(batch, "OPCIONES", 305, 440);
 
         font.getData().setScale(1.4f);
-        font.draw(batch, "M - Activar/desactivar sonido", 230, 340);
-        font.draw(batch, "D - Cambiar dificultad", 230, 300);
+
+        if (game.isSonidoActivado()) {
+            font.draw(batch, "M - Sonido: ACTIVADO", 230, 340);
+        } else {
+            font.draw(batch, "M - Sonido: DESACTIVADO", 230, 340);
+        }
+
+        font.draw(batch, "D - Dificultad: " + game.getDificultad(), 230, 300);
 
         font.getData().setScale(1.2f);
         font.draw(batch, "Pulsa ESC para volver al menu", 260, 160);
 
         batch.end();
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+            game.cambiarSonido();
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            game.cambiarDificultad();
+        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen(new FirstScreen(game));

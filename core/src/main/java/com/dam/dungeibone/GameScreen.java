@@ -57,9 +57,20 @@ public class GameScreen implements Screen {
         vida = 100;
         puntos = 0;
         nivel = 1;
+
         playerSpeed = 220;
-        patrolSpeed = 140;
-        chaserSpeed = 90;
+
+        if (game.getDificultad().equals("FACIL")) {
+            patrolSpeed = 100;
+            chaserSpeed = 60;
+        } else if (game.getDificultad().equals("NORMAL")) {
+            patrolSpeed = 140;
+            chaserSpeed = 90;
+        } else {
+            patrolSpeed = 180;
+            chaserSpeed = 130;
+        }
+
         patrolDirection = 1;
         damageCooldown = 0;
 
@@ -81,14 +92,15 @@ public class GameScreen implements Screen {
             patrolEnemy = new Rectangle(420, 420, 40, 40);
             chaserEnemy = new Rectangle(620, 160, 40, 40);
         } else {
-            key = new Rectangle(650, 100, 25, 25);
+            key = new Rectangle(690, 100, 25, 25);
             door = new Rectangle(700, 500, 50, 70);
 
-            staticEnemy = new Rectangle(300, 300, 40, 40);
-            patrolEnemy = new Rectangle(150, 450, 40, 40);
-            chaserEnemy = new Rectangle(600, 350, 40, 40);
+            staticEnemy = new Rectangle(360, 250, 50, 50);
+            patrolEnemy = new Rectangle(250, 420, 45, 45);
+            chaserEnemy = new Rectangle(560, 220, 45, 45);
         }
     }
+
 
     @Override
     public void render(float delta) {
@@ -135,7 +147,15 @@ public class GameScreen implements Screen {
     }
 
     private void updateEnemies(float delta) {
-        patrolEnemy.x += patrolSpeed * patrolDirection * delta;
+        float patrolSpeedActual = patrolSpeed;
+        float chaserSpeedActual = chaserSpeed;
+
+        if (nivel == 2) {
+            patrolSpeedActual += 50;
+            chaserSpeedActual += 40;
+        }
+
+        patrolEnemy.x += patrolSpeedActual * patrolDirection * delta;
 
         if (patrolEnemy.x < 100) {
             patrolDirection = 1;
@@ -146,19 +166,19 @@ public class GameScreen implements Screen {
         }
 
         if (chaserEnemy.x < player.x) {
-            chaserEnemy.x += chaserSpeed * delta;
+            chaserEnemy.x += chaserSpeedActual * delta;
         }
 
         if (chaserEnemy.x > player.x) {
-            chaserEnemy.x -= chaserSpeed * delta;
+            chaserEnemy.x -= chaserSpeedActual * delta;
         }
 
         if (chaserEnemy.y < player.y) {
-            chaserEnemy.y += chaserSpeed * delta;
+            chaserEnemy.y += chaserSpeedActual * delta;
         }
 
         if (chaserEnemy.y > player.y) {
-            chaserEnemy.y -= chaserSpeed * delta;
+            chaserEnemy.y -= chaserSpeedActual * delta;
         }
     }
 
