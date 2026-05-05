@@ -124,7 +124,7 @@ public class GameScreen implements Screen {
                 nivel = 2;
                 cargarNivel(nivel);
             } else {
-                System.out.println("Victoria");
+                game.setScreen(new VictoryScreen(game, puntos));
             }
         }
     }
