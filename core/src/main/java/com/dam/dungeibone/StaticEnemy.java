@@ -1,0 +1,15 @@
+package com.dam.dungeibone;
+
+import com.badlogic.gdx.graphics.Color;
+
+public class StaticEnemy extends Enemy {
+
+    public StaticEnemy(float x, float y, float width, float height) {
+        super(x, y, width, height, Color.RED, 0);
+    }
+
+    @Override
+    public void update(float delta, Player player, int nivel) {
+        // Este enemigo no se mueve.
+    }
+}

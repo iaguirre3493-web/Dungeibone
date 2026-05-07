@@ -26,13 +26,12 @@ public class GameScreen implements Screen {
     private Rectangle key;
     private Rectangle door;
 
-    private Rectangle staticEnemy;
-    private Rectangle patrolEnemy;
-    private Rectangle chaserEnemy;
+    private StaticEnemy staticEnemy;
+    private PatrolEnemy patrolEnemy;
+    private ChaserEnemy chaserEnemy;
 
-    private float patrolSpeed;
-    private float chaserSpeed;
-    private int patrolDirection;
+    private float patrolBaseSpeed;
+    private float chaserBaseSpeed;
 
     private int vida;
     private int puntos;
@@ -64,17 +63,16 @@ public class GameScreen implements Screen {
         nivel = 1;
 
         if (game.getDificultad().equals("FACIL")) {
-            patrolSpeed = 100;
-            chaserSpeed = 60;
+            patrolBaseSpeed = 100;
+            chaserBaseSpeed = 60;
         } else if (game.getDificultad().equals("NORMAL")) {
-            patrolSpeed = 140;
-            chaserSpeed = 90;
+            patrolBaseSpeed = 140;
+            chaserBaseSpeed = 90;
         } else {
-            patrolSpeed = 180;
-            chaserSpeed = 130;
+            patrolBaseSpeed = 180;
+            chaserBaseSpeed = 130;
         }
 
-        patrolDirection = 1;
         damageCooldown = 0;
 
         cargarNivel(nivel);
@@ -91,16 +89,16 @@ public class GameScreen implements Screen {
             key = new Rectangle(360, 300, 25, 25);
             door = new Rectangle(700, 500, 50, 70);
 
-            staticEnemy = new Rectangle(250, 180, 40, 40);
-            patrolEnemy = new Rectangle(420, 420, 40, 40);
-            chaserEnemy = new Rectangle(620, 160, 40, 40);
+            staticEnemy = new StaticEnemy(250, 180, 40, 40);
+            patrolEnemy = new PatrolEnemy(420, 420, 40, 40, patrolBaseSpeed, 100, 650);
+            chaserEnemy = new ChaserEnemy(620, 160, 40, 40, chaserBaseSpeed);
         } else {
             key = new Rectangle(690, 100, 25, 25);
             door = new Rectangle(700, 500, 50, 70);
 
-            staticEnemy = new Rectangle(360, 250, 50, 50);
-            patrolEnemy = new Rectangle(250, 420, 45, 45);
-            chaserEnemy = new Rectangle(560, 220, 45, 45);
+            staticEnemy = new StaticEnemy(360, 250, 50, 50);
+            patrolEnemy = new PatrolEnemy(250, 420, 45, 45, patrolBaseSpeed, 100, 650);
+            chaserEnemy = new ChaserEnemy(560, 220, 45, 45, chaserBaseSpeed);
         }
     }
 
@@ -115,39 +113,9 @@ public class GameScreen implements Screen {
     }
 
     private void updateEnemies(float delta) {
-        float patrolSpeedActual = patrolSpeed;
-        float chaserSpeedActual = chaserSpeed;
-
-        if (nivel == 2) {
-            patrolSpeedActual += 50;
-            chaserSpeedActual += 40;
-        }
-
-        patrolEnemy.x += patrolSpeedActual * patrolDirection * delta;
-
-        if (patrolEnemy.x < 100) {
-            patrolDirection = 1;
-        }
-
-        if (patrolEnemy.x > 650) {
-            patrolDirection = -1;
-        }
-
-        if (chaserEnemy.x < player.getX()) {
-            chaserEnemy.x += chaserSpeedActual * delta;
-        }
-
-        if (chaserEnemy.x > player.getX()) {
-            chaserEnemy.x -= chaserSpeedActual * delta;
-        }
-
-        if (chaserEnemy.y < player.getY()) {
-            chaserEnemy.y += chaserSpeedActual * delta;
-        }
-
-        if (chaserEnemy.y > player.getY()) {
-            chaserEnemy.y -= chaserSpeedActual * delta;
-        }
+        staticEnemy.update(delta, player, nivel);
+        patrolEnemy.update(delta, player, nivel);
+        chaserEnemy.update(delta, player, nivel);
     }
 
     private void checkCollisions(float delta) {
@@ -163,9 +131,9 @@ public class GameScreen implements Screen {
             }
         }
 
-        if (player.getBounds().overlaps(staticEnemy)
-            || player.getBounds().overlaps(patrolEnemy)
-            || player.getBounds().overlaps(chaserEnemy)) {
+        if (player.getBounds().overlaps(staticEnemy.getBounds())
+            || player.getBounds().overlaps(patrolEnemy.getBounds())
+            || player.getBounds().overlaps(chaserEnemy.getBounds())) {
 
             if (damageCooldown <= 0) {
                 if (game.getDificultad().equals("FACIL")) {
@@ -222,14 +190,9 @@ public class GameScreen implements Screen {
         shapeRenderer.setColor(Color.BROWN);
         shapeRenderer.rect(door.x, door.y, door.width, door.height);
 
-        shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(staticEnemy.x, staticEnemy.y, staticEnemy.width, staticEnemy.height);
-
-        shapeRenderer.setColor(Color.ORANGE);
-        shapeRenderer.rect(patrolEnemy.x, patrolEnemy.y, patrolEnemy.width, patrolEnemy.height);
-
-        shapeRenderer.setColor(Color.PURPLE);
-        shapeRenderer.rect(chaserEnemy.x, chaserEnemy.y, chaserEnemy.width, chaserEnemy.height);
+        staticEnemy.draw(shapeRenderer);
+        patrolEnemy.draw(shapeRenderer);
+        chaserEnemy.draw(shapeRenderer);
 
         shapeRenderer.end();
     }
@@ -253,6 +216,7 @@ public class GameScreen implements Screen {
         font.getData().setScale(1);
         font.draw(batch, "Rojo: estatico | Naranja: patrulla | Morado: perseguidor", 230, 580);
         font.draw(batch, "Objetivo: recoge la llave y llega a la puerta", 280, 555);
+        font.draw(batch, "POO: Player, Enemy, StaticEnemy, PatrolEnemy, ChaserEnemy", 230, 530);
 
         batch.end();
     }
