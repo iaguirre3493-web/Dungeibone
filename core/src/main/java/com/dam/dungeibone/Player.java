@@ -3,22 +3,31 @@ package com.dam.dungeibone;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Player extends Entity {
 
     private float speed;
     private boolean moving;
     private float animationTime;
-    private Texture texture;
+
+    private Texture walkTexture;
+    private TextureRegion[][] walkFrames;
+
+    private int currentDirection;
 
     public Player(float x, float y, float width, float height, float speed) {
         super(x, y, width, height, null);
         this.speed = speed;
         this.moving = false;
         this.animationTime = 0;
-        this.texture = new Texture(Gdx.files.internal("sprites/player.png"));
+        this.currentDirection = 0;
+
+        walkTexture = new Texture(Gdx.files.internal("sprites/player_walk.png"));
+
+        walkFrames = TextureRegion.split(walkTexture, 16, 16);
     }
 
     public void update(float delta) {
@@ -28,21 +37,25 @@ public class Player extends Entity {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
             bounds.x -= speed * delta;
             moving = true;
+            currentDirection = 2;
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
             bounds.x += speed * delta;
             moving = true;
+            currentDirection = 3;
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
             bounds.y += speed * delta;
             moving = true;
+            currentDirection = 1;
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
             bounds.y -= speed * delta;
             moving = true;
+            currentDirection = 0;
         }
 
         keepInsideScreen();
@@ -66,31 +79,27 @@ public class Player extends Entity {
         }
     }
 
-    private boolean isAnimationFrameActive() {
-        return ((int) (animationTime * 8)) % 2 == 0;
+    private TextureRegion getCurrentFrame() {
+        int totalFrames = walkFrames.length;
+
+        if (!moving) {
+            return walkFrames[0][currentDirection];
+        }
+
+        int frameIndex = (int) (animationTime * 8) % totalFrames;
+        return walkFrames[frameIndex][currentDirection];
     }
 
     public void drawSprite(SpriteBatch batch) {
-        float drawWidth = bounds.width;
-        float drawHeight = bounds.height;
-
-        if (moving && !isAnimationFrameActive()) {
-            drawWidth = bounds.width - 6;
-            drawHeight = bounds.height - 6;
-        }
-
-        float offsetX = (bounds.width - drawWidth) / 2;
-        float offsetY = (bounds.height - drawHeight) / 2;
-
-        batch.draw(texture, bounds.x + offsetX, bounds.y + offsetY, drawWidth, drawHeight);
+        batch.draw(getCurrentFrame(), bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
     @Override
     public void draw(ShapeRenderer shapeRenderer) {
-        // Ya no se usa para el jugador, ahora se dibuja con SpriteBatch.
+        // El jugador se dibuja con SpriteBatch usando sprites.
     }
 
     public void dispose() {
-        texture.dispose();
+        walkTexture.dispose();
     }
 }
