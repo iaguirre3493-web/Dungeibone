@@ -2,14 +2,16 @@ package com.dam.dungeibone;
 
 import com.badlogic.gdx.graphics.Color;
 
-public class ChaserEnemy extends Enemy {
+public class EnemyChaser extends Enemy {
 
-    public ChaserEnemy(float x, float y, float width, float height, float speed) {
+    public EnemyChaser(float x, float y, float width, float height, float speed) {
         super(x, y, width, height, Color.PURPLE, speed);
     }
 
     @Override
     public void update(float delta, Player player, int nivel) {
+        super.update(delta, player, nivel);
+
         float currentSpeed = speed;
 
         if (nivel == 2) {

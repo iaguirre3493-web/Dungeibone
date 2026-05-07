@@ -2,13 +2,13 @@ package com.dam.dungeibone;
 
 import com.badlogic.gdx.graphics.Color;
 
-public class PatrolEnemy extends Enemy {
+public class EnemyPatrol extends Enemy {
 
     private int direction;
     private float minX;
     private float maxX;
 
-    public PatrolEnemy(float x, float y, float width, float height, float speed, float minX, float maxX) {
+    public EnemyPatrol(float x, float y, float width, float height, float speed, float minX, float maxX) {
         super(x, y, width, height, Color.ORANGE, speed);
         this.direction = 1;
         this.minX = minX;
@@ -17,6 +17,8 @@ public class PatrolEnemy extends Enemy {
 
     @Override
     public void update(float delta, Player player, int nivel) {
+        super.update(delta, player, nivel);
+
         float currentSpeed = speed;
 
         if (nivel == 2) {

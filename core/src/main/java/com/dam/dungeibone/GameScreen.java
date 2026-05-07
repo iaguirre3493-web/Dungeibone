@@ -27,8 +27,8 @@ public class GameScreen implements Screen {
     private Rectangle door;
 
     private StaticEnemy staticEnemy;
-    private PatrolEnemy patrolEnemy;
-    private ChaserEnemy chaserEnemy;
+    private EnemyPatrol patrolEnemy;
+    private EnemyChaser chaserEnemy;
 
     private float patrolBaseSpeed;
     private float chaserBaseSpeed;
@@ -90,15 +90,15 @@ public class GameScreen implements Screen {
             door = new Rectangle(700, 500, 50, 70);
 
             staticEnemy = new StaticEnemy(250, 180, 40, 40);
-            patrolEnemy = new PatrolEnemy(420, 420, 40, 40, patrolBaseSpeed, 100, 650);
-            chaserEnemy = new ChaserEnemy(620, 160, 40, 40, chaserBaseSpeed);
+            patrolEnemy = new EnemyPatrol(420, 420, 40, 40, patrolBaseSpeed, 100, 650);
+            chaserEnemy = new EnemyChaser(620, 160, 40, 40, chaserBaseSpeed);
         } else {
             key = new Rectangle(690, 100, 25, 25);
             door = new Rectangle(700, 500, 50, 70);
 
             staticEnemy = new StaticEnemy(360, 250, 50, 50);
-            patrolEnemy = new PatrolEnemy(250, 420, 45, 45, patrolBaseSpeed, 100, 650);
-            chaserEnemy = new ChaserEnemy(560, 220, 45, 45, chaserBaseSpeed);
+            patrolEnemy = new EnemyPatrol(250, 420, 45, 45, patrolBaseSpeed, 100, 650);
+            chaserEnemy = new EnemyChaser(560, 220, 45, 45, chaserBaseSpeed);
         }
     }
 

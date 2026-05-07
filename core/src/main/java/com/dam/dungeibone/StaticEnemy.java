@@ -10,6 +10,6 @@ public class StaticEnemy extends Enemy {
 
     @Override
     public void update(float delta, Player player, int nivel) {
-        // Este enemigo no se mueve.
+        super.update(delta, player, nivel);
     }
 }

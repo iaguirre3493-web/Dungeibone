@@ -9,15 +9,18 @@ public class Player extends Entity {
 
     private float speed;
     private boolean moving;
+    private float animationTime;
 
     public Player(float x, float y, float width, float height, float speed) {
         super(x, y, width, height, Color.GREEN);
         this.speed = speed;
         this.moving = false;
+        this.animationTime = 0;
     }
 
     public void update(float delta) {
         moving = false;
+        animationTime += delta;
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
             bounds.x -= speed * delta;
@@ -64,10 +67,27 @@ public class Player extends Entity {
         return moving;
     }
 
+    private boolean isAnimationFrameActive() {
+        return ((int) (animationTime * 8)) % 2 == 0;
+    }
+
     @Override
     public void draw(ShapeRenderer shapeRenderer) {
+        float drawWidth = bounds.width;
+        float drawHeight = bounds.height;
+
+        if (moving) {
+            if (!isAnimationFrameActive()) {
+                drawWidth = bounds.width - 6;
+                drawHeight = bounds.height - 6;
+            }
+        }
+
+        float offsetX = (bounds.width - drawWidth) / 2;
+        float offsetY = (bounds.height - drawHeight) / 2;
+
         shapeRenderer.setColor(Color.GREEN);
-        shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+        shapeRenderer.rect(bounds.x + offsetX, bounds.y + offsetY, drawWidth, drawHeight);
 
         shapeRenderer.setColor(Color.BLACK);
         shapeRenderer.rect(bounds.x + 9, bounds.y + 26, 6, 6);
