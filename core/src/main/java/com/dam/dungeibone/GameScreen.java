@@ -180,7 +180,6 @@ public class GameScreen implements Screen {
         shapeRenderer.setColor(Color.DARK_GRAY);
         shapeRenderer.rect(0, 0, 800, 600);
 
-        player.draw(shapeRenderer);
 
         if (keyVisible) {
             shapeRenderer.setColor(Color.YELLOW);
@@ -195,6 +194,11 @@ public class GameScreen implements Screen {
         chaserEnemy.draw(shapeRenderer);
 
         shapeRenderer.end();
+
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+        player.drawSprite(batch);
+        batch.end();
     }
 
     private void drawHUD() {
@@ -244,5 +248,6 @@ public class GameScreen implements Screen {
         font.dispose();
         pickupSound.dispose();
         hitSound.dispose();
+        player.dispose();
     }
 }
