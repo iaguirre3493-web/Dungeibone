@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class GameScreen implements Screen {
 
@@ -26,6 +27,12 @@ public class GameScreen implements Screen {
     private Texture coinTexture;
     private Texture treasureTexture;
     private Texture doorTexture;
+
+    private TextureRegion[] coinFrames;
+    private TextureRegion[] treasureFrames;
+    private TextureRegion[] flagFrames;
+
+    private float objectAnimTime;
 
     private Player player;
     private Rectangle key;
@@ -67,6 +74,38 @@ public class GameScreen implements Screen {
         treasureTexture = new Texture(Gdx.files.internal("sprites/treasure.png"));
         doorTexture = new Texture(Gdx.files.internal("sprites/door.png"));
 
+        TextureRegion[][] tmpCoin = TextureRegion.split(
+            coinTexture,
+            coinTexture.getWidth() / 4,
+            coinTexture.getHeight()
+        );
+        coinFrames = new TextureRegion[4];
+        for (int i = 0; i < 4; i++) {
+            coinFrames[i] = tmpCoin[0][i];
+        }
+
+        TextureRegion[][] tmpFlag = TextureRegion.split(
+            doorTexture,
+            doorTexture.getWidth() / 4,
+            doorTexture.getHeight()
+        );
+        flagFrames = new TextureRegion[4];
+        for (int i = 0; i < 4; i++) {
+            flagFrames[i] = tmpFlag[0][i];
+        }
+
+        TextureRegion[][] tmpTreasure = TextureRegion.split(
+            treasureTexture,
+            treasureTexture.getWidth() / 2,
+            treasureTexture.getHeight()
+        );
+        treasureFrames = new TextureRegion[2];
+        for (int i = 0; i < 2; i++) {
+            treasureFrames[i] = tmpTreasure[0][i];
+        }
+
+        objectAnimTime = 0;
+
         vida = 100;
         puntos = 0;
         nivel = 1;
@@ -95,15 +134,15 @@ public class GameScreen implements Screen {
         player = new Player(60, 60, 40, 40, 220);
 
         if (numeroNivel == 1) {
-            key = new Rectangle(360, 300, 25, 25);
-            door = new Rectangle(700, 500, 50, 70);
+            key = new Rectangle(360, 300, 35, 35);
+            door = new Rectangle(690, 490, 45, 55);
 
             staticEnemy = new StaticEnemy(250, 180, 40, 40);
             patrolEnemy = new EnemyPatrol(420, 420, 40, 40, patrolBaseSpeed, 100, 650);
             chaserEnemy = new EnemyChaser(620, 160, 40, 40, chaserBaseSpeed);
         } else {
-            key = new Rectangle(670, 100, 50, 40);
-            door = new Rectangle(700, 500, 50, 70);
+            key = new Rectangle(660, 100, 55, 45);
+            door = new Rectangle(690, 490, 45, 55);
 
             staticEnemy = new StaticEnemy(360, 250, 50, 50);
             patrolEnemy = new EnemyPatrol(250, 420, 45, 45, patrolBaseSpeed, 100, 650);
@@ -113,6 +152,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        objectAnimTime += delta;
+
         player.update(delta);
         updateEnemies(delta);
         checkCollisions(delta);
@@ -180,6 +221,21 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 
+    private TextureRegion getCoinFrame() {
+        int frameIndex = (int) (objectAnimTime * 8) % coinFrames.length;
+        return coinFrames[frameIndex];
+    }
+
+    private TextureRegion getTreasureFrame() {
+        int frameIndex = (int) (objectAnimTime * 4) % treasureFrames.length;
+        return treasureFrames[frameIndex];
+    }
+
+    private TextureRegion getFlagFrame() {
+        int frameIndex = (int) (objectAnimTime * 6) % flagFrames.length;
+        return flagFrames[frameIndex];
+    }
+
     private void drawGame() {
         camera.update();
         shapeRenderer.setProjectionMatrix(camera.combined);
@@ -196,13 +252,13 @@ public class GameScreen implements Screen {
 
         if (keyVisible) {
             if (nivel == 1) {
-                batch.draw(coinTexture, key.x, key.y, key.width, key.height);
+                batch.draw(getCoinFrame(), key.x, key.y, key.width, key.height);
             } else {
-                batch.draw(treasureTexture, key.x, key.y, key.width, key.height);
+                batch.draw(getTreasureFrame(), key.x, key.y, key.width, key.height);
             }
         }
 
-        batch.draw(doorTexture, door.x, door.y, door.width, door.height);
+        batch.draw(getFlagFrame(), door.x, door.y, door.width, door.height);
 
         player.drawSprite(batch);
         staticEnemy.drawSprite(batch);
