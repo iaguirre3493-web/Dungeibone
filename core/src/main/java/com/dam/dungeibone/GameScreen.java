@@ -189,15 +189,17 @@ public class GameScreen implements Screen {
         shapeRenderer.setColor(Color.BROWN);
         shapeRenderer.rect(door.x, door.y, door.width, door.height);
 
-        staticEnemy.draw(shapeRenderer);
-        patrolEnemy.draw(shapeRenderer);
-        chaserEnemy.draw(shapeRenderer);
 
         shapeRenderer.end();
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+
         player.drawSprite(batch);
+        staticEnemy.drawSprite(batch);
+        patrolEnemy.drawSprite(batch);
+        chaserEnemy.drawSprite(batch);
+
         batch.end();
     }
 
@@ -249,5 +251,8 @@ public class GameScreen implements Screen {
         pickupSound.dispose();
         hitSound.dispose();
         player.dispose();
+        staticEnemy.dispose();
+        patrolEnemy.dispose();
+        chaserEnemy.dispose();
     }
 }

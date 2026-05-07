@@ -9,7 +9,7 @@ public class EnemyPatrol extends Enemy {
     private float maxX;
 
     public EnemyPatrol(float x, float y, float width, float height, float speed, float minX, float maxX) {
-        super(x, y, width, height, Color.ORANGE, speed);
+        super(x, y, width, height, Color.ORANGE, speed, "sprites/enemy_patrol.png");
         this.direction = 1;
         this.minX = minX;
         this.maxX = maxX;

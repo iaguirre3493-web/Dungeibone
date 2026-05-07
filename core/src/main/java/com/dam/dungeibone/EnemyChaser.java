@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 public class EnemyChaser extends Enemy {
 
     public EnemyChaser(float x, float y, float width, float height, float speed) {
-        super(x, y, width, height, Color.PURPLE, speed);
+        super(x, y, width, height, Color.PURPLE, speed, "sprites/enemy_chaser.png");
     }
 
     @Override
