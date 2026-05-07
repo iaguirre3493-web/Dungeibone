@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.graphics.Texture;
 
 public class GameScreen implements Screen {
 
@@ -21,6 +22,10 @@ public class GameScreen implements Screen {
 
     private Sound pickupSound;
     private Sound hitSound;
+
+    private Texture coinTexture;
+    private Texture treasureTexture;
+    private Texture doorTexture;
 
     private Player player;
     private Rectangle key;
@@ -58,6 +63,10 @@ public class GameScreen implements Screen {
         pickupSound = Gdx.audio.newSound(Gdx.files.internal("sounds/pickup.wav"));
         hitSound = Gdx.audio.newSound(Gdx.files.internal("sounds/hit.wav"));
 
+        coinTexture = new Texture(Gdx.files.internal("sprites/coin.png"));
+        treasureTexture = new Texture(Gdx.files.internal("sprites/treasure.png"));
+        doorTexture = new Texture(Gdx.files.internal("sprites/door.png"));
+
         vida = 100;
         puntos = 0;
         nivel = 1;
@@ -93,7 +102,7 @@ public class GameScreen implements Screen {
             patrolEnemy = new EnemyPatrol(420, 420, 40, 40, patrolBaseSpeed, 100, 650);
             chaserEnemy = new EnemyChaser(620, 160, 40, 40, chaserBaseSpeed);
         } else {
-            key = new Rectangle(690, 100, 25, 25);
+            key = new Rectangle(670, 100, 50, 40);
             door = new Rectangle(700, 500, 50, 70);
 
             staticEnemy = new StaticEnemy(360, 250, 50, 50);
@@ -180,20 +189,20 @@ public class GameScreen implements Screen {
         shapeRenderer.setColor(Color.DARK_GRAY);
         shapeRenderer.rect(0, 0, 800, 600);
 
-
-        if (keyVisible) {
-            shapeRenderer.setColor(Color.YELLOW);
-            shapeRenderer.rect(key.x, key.y, key.width, key.height);
-        }
-
-        shapeRenderer.setColor(Color.BROWN);
-        shapeRenderer.rect(door.x, door.y, door.width, door.height);
-
-
         shapeRenderer.end();
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+
+        if (keyVisible) {
+            if (nivel == 1) {
+                batch.draw(coinTexture, key.x, key.y, key.width, key.height);
+            } else {
+                batch.draw(treasureTexture, key.x, key.y, key.width, key.height);
+            }
+        }
+
+        batch.draw(doorTexture, door.x, door.y, door.width, door.height);
 
         player.drawSprite(batch);
         staticEnemy.drawSprite(batch);
@@ -214,14 +223,14 @@ public class GameScreen implements Screen {
         font.draw(batch, "Nivel: " + nivel, 20, 520);
 
         if (tieneLlave) {
-            font.draw(batch, "Llave: SI", 20, 490);
+            font.draw(batch, "Objeto: SI", 20, 490);
         } else {
-            font.draw(batch, "Llave: NO", 20, 490);
+            font.draw(batch, "Objeto: NO", 20, 490);
         }
 
         font.getData().setScale(1);
         font.draw(batch, "Rojo: estatico | Naranja: patrulla | Morado: perseguidor", 230, 580);
-        font.draw(batch, "Objetivo: recoge la llave y llega a la puerta", 280, 555);
+        font.draw(batch, "Objetivo: recoge el tesoro y llega al barco", 280, 555);
         font.draw(batch, "POO: Player, Enemy, StaticEnemy, PatrolEnemy, ChaserEnemy", 230, 530);
 
         batch.end();
@@ -250,9 +259,12 @@ public class GameScreen implements Screen {
         font.dispose();
         pickupSound.dispose();
         hitSound.dispose();
+        doorTexture.dispose();
         player.dispose();
         staticEnemy.dispose();
         patrolEnemy.dispose();
         chaserEnemy.dispose();
+        coinTexture.dispose();
+        treasureTexture.dispose();
     }
 }

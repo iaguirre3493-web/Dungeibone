@@ -45,8 +45,8 @@ public class InstructionsScreen implements Screen {
 
         font.getData().setScale(1.4f);
         font.draw(batch, "Muevete con WASD o flechas.", 180, 360);
-        font.draw(batch, "Recoge la llave amarilla.", 180, 320);
-        font.draw(batch, "Llega a la puerta marron para pasar de nivel.", 180, 280);
+        font.draw(batch, "Encuentra y recoge el tesoro.", 180, 320);
+        font.draw(batch, "Llega al barco para pasar de nivel.", 180, 280);
         font.draw(batch, "Evita los enemigos: rojo, naranja y morado.", 180, 240);
         font.draw(batch, "Supera el nivel 2 para ganar.", 180, 200);
 
