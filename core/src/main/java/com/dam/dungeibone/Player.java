@@ -76,11 +76,9 @@ public class Player extends Entity {
         float drawWidth = bounds.width;
         float drawHeight = bounds.height;
 
-        if (moving) {
-            if (!isAnimationFrameActive()) {
-                drawWidth = bounds.width - 6;
-                drawHeight = bounds.height - 6;
-            }
+        if (moving && !isAnimationFrameActive()) {
+            drawWidth = bounds.width - 6;
+            drawHeight = bounds.height - 6;
         }
 
         float offsetX = (bounds.width - drawWidth) / 2;
