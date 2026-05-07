@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 public class EnemyChaser extends Enemy {
 
     public EnemyChaser(float x, float y, float width, float height, float speed) {
-        super(x, y, width, height, Color.PURPLE, speed, "sprites/enemy_chaser.png");
+        super(x, y, width, height, Color.PURPLE, speed, "sprites/enemy_chaser.png", DOWN);
     }
 
     @Override
@@ -18,20 +18,27 @@ public class EnemyChaser extends Enemy {
             currentSpeed += 40;
         }
 
-        if (bounds.x < player.getX()) {
-            bounds.x += currentSpeed * delta;
+        float distanceX = player.getX() - bounds.x;
+        float distanceY = player.getY() - bounds.y;
+
+        if (Math.abs(distanceX) > Math.abs(distanceY)) {
+            if (distanceX > 0) {
+                bounds.x += currentSpeed * delta;
+                direction = RIGHT;
+            } else {
+                bounds.x -= currentSpeed * delta;
+                direction = LEFT;
+            }
+        } else {
+            if (distanceY > 0) {
+                bounds.y += currentSpeed * delta;
+                direction = UP;
+            } else {
+                bounds.y -= currentSpeed * delta;
+                direction = DOWN;
+            }
         }
 
-        if (bounds.x > player.getX()) {
-            bounds.x -= currentSpeed * delta;
-        }
-
-        if (bounds.y < player.getY()) {
-            bounds.y += currentSpeed * delta;
-        }
-
-        if (bounds.y > player.getY()) {
-            bounds.y -= currentSpeed * delta;
-        }
+        moving = true;
     }
 }
