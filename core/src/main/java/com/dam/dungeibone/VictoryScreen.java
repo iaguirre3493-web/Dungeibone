@@ -43,13 +43,16 @@ public class VictoryScreen implements Screen {
         batch.begin();
 
         font.getData().setScale(3);
-        font.draw(batch, "VICTORIA", 300, 380);
+        font.draw(batch, "VICTORIA", 300, 410);
 
-        font.getData().setScale(1.7f);
-        font.draw(batch, "Puntuacion final: " + puntosFinales, 270, 310);
+        font.getData().setScale(1.8f);
+        font.draw(batch, "Has escapado con el tesoro", 210, 340);
+
+        font.getData().setScale(1.5f);
+        font.draw(batch, "Puntuacion final: " + puntosFinales, 270, 290);
 
         font.getData().setScale(1.2f);
-        font.draw(batch, "Pulsa ENTER para volver al menu", 250, 250);
+        font.draw(batch, "Pulsa ENTER para volver al menu", 250, 230);
 
         batch.end();
 
