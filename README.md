@@ -1,33 +1,133 @@
 # Dungeibone
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+Dungeibone es un videojuego 2D desarrollado con Java y libGDX para la asignatura PMDM.
 
-This project was generated with a template including simple application launchers and a main class extending `Game` that sets the first screen.
+El juego consiste en superar dos niveles evitando enemigos, recogiendo objetos y llegando a la bandera de salida.
 
-## Platforms
+## Objetivo del juego
 
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
+El jugador debe moverse por el escenario, evitar a los enemigos y recoger el objeto de cada nivel.
 
-## Gradle
+- Nivel 1: recoger la moneda y llegar a la bandera.
+- Nivel 2: recoger el tesoro final y llegar a la bandera para ganar.
 
-This project uses [Gradle](https://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
+Si la vida llega a 0, aparece la pantalla de Game Over.
 
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
+## Controles
 
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+- W / Flecha arriba: mover hacia arriba
+- A / Flecha izquierda: mover hacia la izquierda
+- S / Flecha abajo: mover hacia abajo
+- D / Flecha derecha: mover hacia la derecha
+- ENTER: iniciar partida o volver al menú
+- ESC: volver al menú o salir
+- I: abrir instrucciones
+- O: abrir opciones
+- M: activar o desactivar sonido
+- D: cambiar dificultad
+
+## Menús
+
+El juego incluye:
+
+- Menú principal
+- Pantalla de instrucciones
+- Pantalla de opciones
+- Pantalla de Game Over
+- Pantalla de victoria
+
+## Opciones configurables
+
+Desde el menú de opciones se puede configurar:
+
+- Sonido activado o desactivado
+- Dificultad: FACIL, NORMAL o DIFICIL
+
+La dificultad afecta a la velocidad de los enemigos y al daño recibido por el jugador.
+
+## HUD
+
+Durante la partida se muestra información en pantalla:
+
+- Vida
+- Puntos
+- Nivel actual
+- Si el objeto del nivel ha sido recogido o no
+
+## Enemigos
+
+El juego incluye tres NPCs/enemigos diferentes:
+
+1. Enemigo estático  
+   Permanece quieto en el escenario.
+
+2. Enemigo patrullero  
+   Se mueve horizontalmente entre dos puntos.
+
+3. Enemigo perseguidor  
+   Persigue al jugador durante la partida.
+
+Cada enemigo tiene comportamiento propio y causa daño al jugador al tocarlo.
+
+## Sonido
+
+El juego incluye efectos de sonido:
+
+- Sonido al recoger moneda o tesoro
+- Sonido al recibir daño
+
+El sonido puede activarse o desactivarse desde el menú de opciones.
+
+## Animaciones
+
+El juego incluye animaciones básicas:
+
+- Animación del jugador al moverse
+- Animación de enemigos según su dirección
+- Animación de la moneda
+- Animación del tesoro
+- Animación de la bandera de salida
+
+## Programación Orientada a Objetos
+
+El proyecto está organizado usando clases para separar responsabilidades.
+
+Clases principales:
+
+- `DungeiboneGame`: clase principal del juego.
+- `FirstScreen`: menú principal.
+- `GameScreen`: pantalla principal de juego.
+- `InstructionsScreen`: pantalla de instrucciones.
+- `OptionsScreen`: pantalla de opciones.
+- `VictoryScreen`: pantalla de victoria.
+- `GameOverScreen`: pantalla de derrota.
+- `Entity`: clase base para entidades del juego.
+- `Player`: jugador principal.
+- `Enemy`: clase base para enemigos.
+- `StaticEnemy`: enemigo estático.
+- `EnemyPatrol`: enemigo con patrulla horizontal.
+- `EnemyChaser`: enemigo que persigue al jugador.
+
+## Assets utilizados
+
+Para los gráficos y sonidos se ha utilizado el pack:
+
+**Ninja Adventure - Asset Pack**
+
+Se han utilizado sprites para:
+
+- Jugador
+- Enemigos
+- Moneda
+- Tesoro
+- Bandera
+- Efectos de sonido
+
+## Cómo ejecutar el juego
+
+El proyecto se ejecuta desde IntelliJ IDEA usando la configuración de escritorio de libGDX.
+
+También puede ejecutarse desde terminal con Gradle:
+
+```bash
+./gradlew lwjgl3:run
