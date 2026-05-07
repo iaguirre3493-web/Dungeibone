@@ -230,8 +230,13 @@ public class GameScreen implements Screen {
 
         font.getData().setScale(1);
         font.draw(batch, "Rojo: estatico | Naranja: patrulla | Morado: perseguidor", 230, 580);
-        font.draw(batch, "Objetivo: recoge el tesoro y llega a la bandera", 280, 555);
-        font.draw(batch, "POO: Player, Enemy, StaticEnemy, PatrolEnemy, ChaserEnemy", 230, 530);
+
+        if (nivel == 1) {
+            font.draw(batch, "Objetivo: recoge la moneda y llega a la bandera", 280, 555);
+        } else {
+            font.draw(batch, "Objetivo: recoge el tesoro y llega a la bandera", 280, 555);
+        }
+        font.draw(batch, "POO: Player, Enemy, StaticEnemy, EnemyPatrol, EnemyChaser", 230, 530);
 
         batch.end();
     }
