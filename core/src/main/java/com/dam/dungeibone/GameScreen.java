@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import java.util.ArrayList;
 
 public class GameScreen implements Screen {
 
@@ -43,9 +44,7 @@ public class GameScreen implements Screen {
     private Rectangle key;
     private Rectangle door;
 
-    private StaticEnemy staticEnemy;
-    private EnemyPatrol patrolEnemy;
-    private EnemyChaser chaserEnemy;
+    private ArrayList<Enemy> enemies;
 
     private float patrolBaseSpeed;
     private float chaserBaseSpeed;
@@ -143,21 +142,43 @@ public class GameScreen implements Screen {
         damageCooldown = 0;
 
         player = new Player(60, 60, 40, 40, 220);
+        enemies = new ArrayList<>();
 
         if (numeroNivel == 1) {
             key = new Rectangle(360, 300, 35, 35);
             door = new Rectangle(690, 490, 45, 55);
 
-            staticEnemy = new StaticEnemy(250, 180, 40, 40);
-            patrolEnemy = new EnemyPatrol(420, 420, 40, 40, patrolBaseSpeed, 100, 650);
-            chaserEnemy = new EnemyChaser(620, 160, 40, 40, chaserBaseSpeed);
+            enemies.add(new StaticEnemy(250, 180, 40, 40));
+            enemies.add(new EnemyPatrol(420, 420, 40, 40, patrolBaseSpeed, 100, 650));
+            enemies.add(new EnemyChaser(620, 160, 40, 40, chaserBaseSpeed));
+
+            if (game.getDificultad().equals("NORMAL") || game.getDificultad().equals("DIFICIL")) {
+                enemies.add(new StaticEnemy(520, 300, 40, 40));
+                enemies.add(new EnemyPatrol(180, 350, 40, 40, patrolBaseSpeed, 100, 600));
+            }
+
+            if (game.getDificultad().equals("DIFICIL")) {
+                enemies.add(new EnemyChaser(350, 120, 40, 40, chaserBaseSpeed));
+                enemies.add(new EnemyPatrol(580, 230, 40, 40, patrolBaseSpeed, 300, 720));
+            }
+
         } else {
             key = new Rectangle(660, 100, 55, 45);
             door = new Rectangle(690, 490, 45, 55);
 
-            staticEnemy = new StaticEnemy(360, 250, 50, 50);
-            patrolEnemy = new EnemyPatrol(250, 420, 45, 45, patrolBaseSpeed, 100, 650);
-            chaserEnemy = new EnemyChaser(560, 220, 45, 45, chaserBaseSpeed);
+            enemies.add(new StaticEnemy(360, 250, 50, 50));
+            enemies.add(new EnemyPatrol(250, 420, 45, 45, patrolBaseSpeed, 100, 650));
+            enemies.add(new EnemyChaser(560, 220, 45, 45, chaserBaseSpeed));
+
+            if (game.getDificultad().equals("NORMAL") || game.getDificultad().equals("DIFICIL")) {
+                enemies.add(new StaticEnemy(180, 330, 45, 45));
+                enemies.add(new EnemyPatrol(480, 150, 45, 45, patrolBaseSpeed, 250, 700));
+            }
+
+            if (game.getDificultad().equals("DIFICIL")) {
+                enemies.add(new EnemyChaser(690, 360, 45, 45, chaserBaseSpeed));
+                enemies.add(new EnemyPatrol(120, 220, 45, 45, patrolBaseSpeed, 80, 500));
+            }
         }
     }
 
@@ -174,9 +195,9 @@ public class GameScreen implements Screen {
     }
 
     private void updateEnemies(float delta) {
-        staticEnemy.update(delta, player, nivel);
-        patrolEnemy.update(delta, player, nivel);
-        chaserEnemy.update(delta, player, nivel);
+        for (Enemy enemy : enemies) {
+            enemy.update(delta, player, nivel);
+        }
     }
 
     private void checkCollisions(float delta) {
@@ -192,25 +213,28 @@ public class GameScreen implements Screen {
             }
         }
 
-        if (player.getBounds().overlaps(staticEnemy.getBounds())
-            || player.getBounds().overlaps(patrolEnemy.getBounds())
-            || player.getBounds().overlaps(chaserEnemy.getBounds())) {
+        boolean enemyCollision = false;
 
-            if (damageCooldown <= 0) {
-                if (game.getDificultad().equals("FACIL")) {
-                    vida -= 5;
-                } else if (game.getDificultad().equals("NORMAL")) {
-                    vida -= 10;
-                } else {
-                    vida -= 15;
-                }
-
-                if (game.isSonidoActivado()) {
-                    hitSound.play();
-                }
-
-                damageCooldown = 1;
+        for (Enemy enemy : enemies) {
+            if (player.getBounds().overlaps(enemy.getBounds())) {
+                enemyCollision = true;
             }
+        }
+
+        if (enemyCollision && damageCooldown <= 0) {
+            if (game.getDificultad().equals("FACIL")) {
+                vida -= 5;
+            } else if (game.getDificultad().equals("NORMAL")) {
+                vida -= 10;
+            } else {
+                vida -= 15;
+            }
+
+            if (game.isSonidoActivado()) {
+                hitSound.play();
+            }
+
+            damageCooldown = 1;
         }
 
         if (vida <= 0) {
@@ -332,9 +356,9 @@ public class GameScreen implements Screen {
         batch.draw(getFlagFrame(), door.x, door.y, door.width, door.height);
 
         player.drawSprite(batch);
-        staticEnemy.drawSprite(batch);
-        patrolEnemy.drawSprite(batch);
-        chaserEnemy.drawSprite(batch);
+        for (Enemy enemy : enemies) {
+            enemy.drawSprite(batch);
+        }
 
         batch.end();
     }
@@ -393,9 +417,9 @@ public class GameScreen implements Screen {
         hitSound.dispose();
         doorTexture.dispose();
         player.dispose();
-        staticEnemy.dispose();
-        patrolEnemy.dispose();
-        chaserEnemy.dispose();
+        for (Enemy enemy : enemies) {
+            enemy.dispose();
+        }
         coinTexture.dispose();
         treasureTexture.dispose();
         floorTexture.dispose();
