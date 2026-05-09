@@ -1,17 +1,20 @@
 package com.dam.dungeibone;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
 import java.util.ArrayList;
 
 public class GameScreen implements Screen {
@@ -28,6 +31,7 @@ public class GameScreen implements Screen {
     private Texture coinTexture;
     private Texture treasureTexture;
     private Texture doorTexture;
+    private Texture pauseTexture;
 
     private Texture floorTexture;
     private TextureRegion[][] floorTiles;
@@ -57,6 +61,10 @@ public class GameScreen implements Screen {
     private boolean keyVisible;
     private float damageCooldown;
 
+    private boolean pausa;
+    private int opcionPausa;
+    private String[] opcionesPausa;
+
     public GameScreen(DungeiboneGame game) {
         this.game = game;
     }
@@ -68,7 +76,9 @@ public class GameScreen implements Screen {
 
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
-        font = new BitmapFont();
+
+        font = new BitmapFont(Gdx.files.internal("fonts/dungeibone_clean.fnt"));
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.setColor(Color.WHITE);
 
         pickupSound = Gdx.audio.newSound(Gdx.files.internal("sounds/pickup.wav"));
@@ -77,6 +87,9 @@ public class GameScreen implements Screen {
         coinTexture = new Texture(Gdx.files.internal("sprites/coin.png"));
         treasureTexture = new Texture(Gdx.files.internal("sprites/treasure.png"));
         doorTexture = new Texture(Gdx.files.internal("sprites/door.png"));
+
+        pauseTexture = new Texture(Gdx.files.internal("sprites/pausa.png"));
+        pauseTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         floorTexture = new Texture(Gdx.files.internal("sprites/floor_tileset.png"));
         floorTiles = TextureRegion.split(floorTexture, 16, 16);
@@ -89,7 +102,9 @@ public class GameScreen implements Screen {
             coinTexture.getWidth() / 4,
             coinTexture.getHeight()
         );
+
         coinFrames = new TextureRegion[4];
+
         for (int i = 0; i < 4; i++) {
             coinFrames[i] = tmpCoin[0][i];
         }
@@ -99,7 +114,9 @@ public class GameScreen implements Screen {
             doorTexture.getWidth() / 4,
             doorTexture.getHeight()
         );
+
         flagFrames = new TextureRegion[4];
+
         for (int i = 0; i < 4; i++) {
             flagFrames[i] = tmpFlag[0][i];
         }
@@ -109,7 +126,9 @@ public class GameScreen implements Screen {
             treasureTexture.getWidth() / 2,
             treasureTexture.getHeight()
         );
+
         treasureFrames = new TextureRegion[2];
+
         for (int i = 0; i < 2; i++) {
             treasureFrames[i] = tmpTreasure[0][i];
         }
@@ -133,6 +152,16 @@ public class GameScreen implements Screen {
 
         damageCooldown = 0;
 
+        pausa = false;
+        opcionPausa = 0;
+
+        opcionesPausa = new String[]{
+            "Continuar partida",
+            "Sonido",
+            "Volver al menu",
+            "Salir del juego"
+        };
+
         cargarNivel(nivel);
     }
 
@@ -140,6 +169,7 @@ public class GameScreen implements Screen {
         tieneLlave = false;
         keyVisible = true;
         damageCooldown = 0;
+        pausa = false;
 
         player = new Player(60, 60, 40, 40, 220);
         enemies = new ArrayList<>();
@@ -184,14 +214,72 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        objectAnimTime += delta;
+        handlePauseInput();
 
-        player.update(delta);
-        updateEnemies(delta);
-        checkCollisions(delta);
         clearScreen();
+
+        if (!pausa) {
+            objectAnimTime += delta;
+
+            player.update(delta);
+            updateEnemies(delta);
+            checkCollisions(delta);
+        }
+
         drawGame();
         drawHUD();
+
+        if (pausa) {
+            drawPauseScreen();
+        }
+    }
+
+    private void handlePauseInput() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            pausa = !pausa;
+        }
+
+        if (!pausa) {
+            return;
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+            opcionPausa--;
+
+            if (opcionPausa < 0) {
+                opcionPausa = opcionesPausa.length - 1;
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+            opcionPausa++;
+
+            if (opcionPausa >= opcionesPausa.length) {
+                opcionPausa = 0;
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            ejecutarOpcionPausa();
+        }
+    }
+
+    private void ejecutarOpcionPausa() {
+        if (opcionPausa == 0) {
+            pausa = false;
+        }
+
+        if (opcionPausa == 1) {
+            game.setSonidoActivado(!game.isSonidoActivado());
+        }
+
+        if (opcionPausa == 2) {
+            game.setScreen(new FirstScreen(game));
+        }
+
+        if (opcionPausa == 3) {
+            Gdx.app.exit();
+        }
     }
 
     private void updateEnemies(float delta) {
@@ -289,54 +377,6 @@ public class GameScreen implements Screen {
         }
     }
 
-    private void drawMapBackground() {
-        // Fondo base
-        shapeRenderer.setColor(0.10f, 0.10f, 0.12f, 1);
-        shapeRenderer.rect(0, 0, 800, 600);
-
-        // Suelo tipo baldosas
-        for (int x = 0; x < 800; x += 40) {
-            for (int y = 0; y < 600; y += 40) {
-                if ((x / 40 + y / 40) % 2 == 0) {
-                    shapeRenderer.setColor(0.13f, 0.13f, 0.16f, 1);
-                } else {
-                    shapeRenderer.setColor(0.16f, 0.16f, 0.19f, 1);
-                }
-
-                shapeRenderer.rect(x, y, 40, 40);
-            }
-        }
-
-        // Paredes exteriores
-        shapeRenderer.setColor(0.04f, 0.04f, 0.06f, 1);
-        shapeRenderer.rect(0, 0, 800, 25);
-        shapeRenderer.rect(0, 575, 800, 25);
-        shapeRenderer.rect(0, 0, 25, 600);
-        shapeRenderer.rect(775, 0, 25, 600);
-
-        // Decoración nivel 1
-        if (nivel == 1) {
-            shapeRenderer.setColor(0.18f, 0.12f, 0.08f, 1);
-            shapeRenderer.rect(180, 120, 120, 30);
-            shapeRenderer.rect(500, 330, 150, 30);
-
-            shapeRenderer.setColor(0.08f, 0.16f, 0.10f, 1);
-            shapeRenderer.rect(90, 430, 80, 80);
-            shapeRenderer.rect(610, 80, 90, 70);
-        }
-
-        // Decoración nivel 2
-        if (nivel == 2) {
-            shapeRenderer.setColor(0.18f, 0.06f, 0.06f, 1);
-            shapeRenderer.rect(170, 150, 160, 35);
-            shapeRenderer.rect(450, 360, 180, 35);
-
-            shapeRenderer.setColor(0.12f, 0.04f, 0.16f, 1);
-            shapeRenderer.rect(90, 400, 100, 90);
-            shapeRenderer.rect(560, 90, 120, 90);
-        }
-    }
-
     private void drawGame() {
         camera.update();
 
@@ -356,6 +396,7 @@ public class GameScreen implements Screen {
         batch.draw(getFlagFrame(), door.x, door.y, door.width, door.height);
 
         player.drawSprite(batch);
+
         for (Enemy enemy : enemies) {
             enemy.drawSprite(batch);
         }
@@ -365,21 +406,122 @@ public class GameScreen implements Screen {
 
     private void drawHUD() {
         batch.setProjectionMatrix(camera.combined);
-
         batch.begin();
 
-        font.getData().setScale(1.5f);
-        font.draw(batch, "Vida: " + vida, 20, 580);
-        font.draw(batch, "Puntos: " + puntos, 20, 550);
-        font.draw(batch, "Nivel: " + nivel, 20, 520);
+        font.setColor(Color.WHITE);
+        font.getData().setScale(0.55f);
+
+        font.draw(batch, "Vida: " + vida, 25, 575);
+        font.draw(batch, "Puntos: " + puntos, 25, 545);
+        font.draw(batch, "Nivel: " + nivel, 25, 515);
 
         if (tieneLlave) {
-            font.draw(batch, "Objeto: SI", 20, 490);
+            font.draw(batch, "Objeto: SI", 25, 485);
         } else {
-            font.draw(batch, "Objeto: NO", 20, 490);
+            font.draw(batch, "Objeto: NO", 25, 485);
         }
 
+        font.getData().setScale(0.42f);
+        font.draw(batch, "P - Pausa", 25, 455);
+
         batch.end();
+    }
+
+    private void drawPauseScreen() {
+        camera.update();
+
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+        batch.draw(pauseTexture, 0, 0, 800, 600);
+        batch.end();
+
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        // Recuadro bajado para no tapar el titulo de la imagen
+        shapeRenderer.setColor(0, 0, 0, 0.88f);
+        shapeRenderer.rect(245, 65, 310, 270);
+
+        shapeRenderer.setColor(0.32f, 0.16f, 0.06f, 1);
+        shapeRenderer.rect(258, 78, 284, 244);
+
+        shapeRenderer.setColor(0.70f, 0.42f, 0.12f, 1);
+        shapeRenderer.rect(258, 312, 284, 10);
+        shapeRenderer.rect(258, 78, 284, 10);
+        shapeRenderer.rect(258, 78, 10, 244);
+        shapeRenderer.rect(532, 78, 10, 244);
+
+        // Interior oscuro
+        shapeRenderer.setColor(0.17f, 0.07f, 0.03f, 1);
+        shapeRenderer.rect(282, 112, 236, 180);
+
+        // Cajas separadas para que no parezca un parrafo
+        for (int i = 0; i < opcionesPausa.length; i++) {
+            if (i == opcionPausa) {
+                shapeRenderer.setColor(0.75f, 0.45f, 0.10f, 1);
+            } else {
+                shapeRenderer.setColor(0.25f, 0.11f, 0.04f, 1);
+            }
+
+            shapeRenderer.rect(300, 250 - i * 40, 200, 28);
+        }
+
+        shapeRenderer.end();
+
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+
+        font.setColor(Color.WHITE);
+        font.getData().setScale(0.43f);
+
+        for (int i = 0; i < opcionesPausa.length; i++) {
+            String texto = "";
+
+            if (i == 0) {
+                texto = "Continuar partida";
+            }
+
+            if (i == 1) {
+                if (game.isSonidoActivado()) {
+                    texto = "Sonido: ACTIVADO";
+                } else {
+                    texto = "Sonido: DESACTIVADO";
+                }
+            }
+
+            if (i == 2) {
+                texto = "Volver al menu";
+            }
+
+            if (i == 3) {
+                texto = "Salir del juego";
+            }
+
+            if (i == opcionPausa) {
+                texto = "> " + texto + " <";
+            }
+
+            drawCenteredMenuLine(texto, 270 - i * 40);
+        }
+
+        font.getData().setScale(0.32f);
+        drawCenteredMenuLine("ARRIBA / ABAJO - Mover", 105);
+        drawCenteredMenuLine("ENTER - Seleccionar    P - Continuar", 88);
+
+        batch.end();
+    }
+
+    private void drawCenteredMenuLine(String text, float y) {
+        GlyphLayout layout = new GlyphLayout();
+        layout.setText(font, text);
+
+        float x = 400 - layout.width / 2f;
+
+        font.setColor(Color.BLACK);
+        font.draw(batch, text, x + 2, y - 2);
+
+        font.setColor(Color.WHITE);
+        font.draw(batch, text, x, y);
     }
 
     @Override
@@ -403,15 +545,20 @@ public class GameScreen implements Screen {
         shapeRenderer.dispose();
         batch.dispose();
         font.dispose();
+
         pickupSound.dispose();
         hitSound.dispose();
+
+        coinTexture.dispose();
+        treasureTexture.dispose();
         doorTexture.dispose();
+        pauseTexture.dispose();
+        floorTexture.dispose();
+
         player.dispose();
+
         for (Enemy enemy : enemies) {
             enemy.dispose();
         }
-        coinTexture.dispose();
-        treasureTexture.dispose();
-        floorTexture.dispose();
     }
 }

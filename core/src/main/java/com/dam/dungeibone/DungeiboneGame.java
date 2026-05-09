@@ -35,4 +35,8 @@ public class DungeiboneGame extends Game {
             dificultad = "FACIL";
         }
     }
+
+    public void setSonidoActivado(boolean sonidoActivado) {
+        this.sonidoActivado = sonidoActivado;
+    }
 }

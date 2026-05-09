@@ -31,14 +31,18 @@ public class GameOverScreen implements Screen {
     @Override
     public void show() {
         batch = new SpriteBatch();
-        font = new BitmapFont();
+
+        font = new BitmapFont(Gdx.files.internal("fonts/dungeibone_clean.fnt"));
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         font.setColor(Color.WHITE);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
 
         shapeRenderer = new ShapeRenderer();
+
         backgroundTexture = new Texture(Gdx.files.internal("sprites/game_over.png"));
+        backgroundTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
     }
 
     @Override
@@ -59,6 +63,7 @@ public class GameOverScreen implements Screen {
 
     private void drawBackground() {
         batch.setProjectionMatrix(camera.combined);
+
         batch.begin();
         batch.draw(backgroundTexture, 0, 0, 800, 600);
         batch.end();
@@ -68,20 +73,24 @@ public class GameOverScreen implements Screen {
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        // Sombra del recuadro
-        shapeRenderer.setColor(0, 0, 0, 0.85f);
-        shapeRenderer.rect(145, 205, 510, 185);
+        // Sombra
+        shapeRenderer.setColor(0, 0, 0, 1);
+        shapeRenderer.rect(145, 190, 510, 190);
 
-        // Recuadro marrón estilo tierra
-        shapeRenderer.setColor(0.30f, 0.15f, 0.06f, 1);
-        shapeRenderer.rect(160, 220, 480, 155);
+        // Recuadro marrón
+        shapeRenderer.setColor(0.32f, 0.16f, 0.06f, 1);
+        shapeRenderer.rect(160, 205, 480, 160);
 
-        // Borde marrón claro
-        shapeRenderer.setColor(0.55f, 0.32f, 0.12f, 1);
-        shapeRenderer.rect(160, 365, 480, 8);
-        shapeRenderer.rect(160, 220, 480, 8);
-        shapeRenderer.rect(160, 220, 8, 155);
-        shapeRenderer.rect(632, 220, 8, 155);
+        // Borde claro
+        shapeRenderer.setColor(0.65f, 0.38f, 0.12f, 1);
+        shapeRenderer.rect(160, 355, 480, 10);
+        shapeRenderer.rect(160, 205, 480, 10);
+        shapeRenderer.rect(160, 205, 10, 160);
+        shapeRenderer.rect(630, 205, 10, 160);
+
+        // Interior oscuro para que el texto se lea mejor
+        shapeRenderer.setColor(0.22f, 0.10f, 0.04f, 1);
+        shapeRenderer.rect(180, 225, 440, 115);
 
         shapeRenderer.end();
     }
@@ -90,31 +99,28 @@ public class GameOverScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        // NO ponemos aquí "GAME OVER" porque ya está en la imagen
-
-        font.getData().setScale(1.55f);
-        drawCenteredStrongLine("Has sido derrotado", 345);
-
-        font.getData().setScale(1.25f);
-        drawCenteredStrongLine("Puntuacion final: " + puntosFinales, 305);
-
-        font.getData().setScale(1.05f);
-        drawCenteredStrongLine("Pulsa ENTER para volver al menu", 265);
-
         font.setColor(Color.WHITE);
+
+        font.getData().setScale(0.65f);
+        drawCenteredCleanLine("Has sido derrotado", 320);
+
+        font.getData().setScale(0.55f);
+        drawCenteredCleanLine("Puntuacion final: " + puntosFinales, 285);
+
+        font.getData().setScale(0.45f);
+        drawCenteredCleanLine("Pulsa ENTER para volver al menu", 250);
+
         batch.end();
     }
 
-    private void drawCenteredStrongLine(String text, float y) {
+    private void drawCenteredCleanLine(String text, float y) {
         GlyphLayout layout = new GlyphLayout();
         layout.setText(font, text);
-        float x = (800 - layout.width) / 2f;
+
+        float x = 400 - layout.width / 2f;
 
         font.setColor(Color.BLACK);
-        font.draw(batch, text, x - 1, y);
-        font.draw(batch, text, x + 1, y);
-        font.draw(batch, text, x, y - 1);
-        font.draw(batch, text, x, y + 1);
+        font.draw(batch, text, x + 2, y - 2);
 
         font.setColor(Color.WHITE);
         font.draw(batch, text, x, y);
