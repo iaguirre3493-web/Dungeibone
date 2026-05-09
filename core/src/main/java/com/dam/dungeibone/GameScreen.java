@@ -28,6 +28,11 @@ public class GameScreen implements Screen {
     private Texture treasureTexture;
     private Texture doorTexture;
 
+    private Texture floorTexture;
+    private TextureRegion[][] floorTiles;
+    private TextureRegion floorTile;
+    private TextureRegion borderTile;
+
     private TextureRegion[] coinFrames;
     private TextureRegion[] treasureFrames;
     private TextureRegion[] flagFrames;
@@ -73,6 +78,12 @@ public class GameScreen implements Screen {
         coinTexture = new Texture(Gdx.files.internal("sprites/coin.png"));
         treasureTexture = new Texture(Gdx.files.internal("sprites/treasure.png"));
         doorTexture = new Texture(Gdx.files.internal("sprites/door.png"));
+
+        floorTexture = new Texture(Gdx.files.internal("sprites/floor_tileset.png"));
+        floorTiles = TextureRegion.split(floorTexture, 16, 16);
+
+        floorTile = floorTiles[1][1];
+        borderTile = floorTiles[0][0];
 
         TextureRegion[][] tmpCoin = TextureRegion.split(
             coinTexture,
@@ -236,19 +247,79 @@ public class GameScreen implements Screen {
         return flagFrames[frameIndex];
     }
 
-    private void drawGame() {
-        camera.update();
-        shapeRenderer.setProjectionMatrix(camera.combined);
+    private void drawTileBackground() {
+        for (int x = 0; x < 800; x += 32) {
+            for (int y = 0; y < 600; y += 32) {
+                batch.draw(floorTile, x, y, 32, 32);
+            }
+        }
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (int x = 0; x < 800; x += 32) {
+            batch.draw(borderTile, x, 0, 32, 32);
+            batch.draw(borderTile, x, 568, 32, 32);
+        }
 
-        shapeRenderer.setColor(Color.DARK_GRAY);
+        for (int y = 0; y < 600; y += 32) {
+            batch.draw(borderTile, 0, y, 32, 32);
+            batch.draw(borderTile, 768, y, 32, 32);
+        }
+    }
+
+    private void drawMapBackground() {
+        // Fondo base
+        shapeRenderer.setColor(0.10f, 0.10f, 0.12f, 1);
         shapeRenderer.rect(0, 0, 800, 600);
 
-        shapeRenderer.end();
+        // Suelo tipo baldosas
+        for (int x = 0; x < 800; x += 40) {
+            for (int y = 0; y < 600; y += 40) {
+                if ((x / 40 + y / 40) % 2 == 0) {
+                    shapeRenderer.setColor(0.13f, 0.13f, 0.16f, 1);
+                } else {
+                    shapeRenderer.setColor(0.16f, 0.16f, 0.19f, 1);
+                }
+
+                shapeRenderer.rect(x, y, 40, 40);
+            }
+        }
+
+        // Paredes exteriores
+        shapeRenderer.setColor(0.04f, 0.04f, 0.06f, 1);
+        shapeRenderer.rect(0, 0, 800, 25);
+        shapeRenderer.rect(0, 575, 800, 25);
+        shapeRenderer.rect(0, 0, 25, 600);
+        shapeRenderer.rect(775, 0, 25, 600);
+
+        // Decoración nivel 1
+        if (nivel == 1) {
+            shapeRenderer.setColor(0.18f, 0.12f, 0.08f, 1);
+            shapeRenderer.rect(180, 120, 120, 30);
+            shapeRenderer.rect(500, 330, 150, 30);
+
+            shapeRenderer.setColor(0.08f, 0.16f, 0.10f, 1);
+            shapeRenderer.rect(90, 430, 80, 80);
+            shapeRenderer.rect(610, 80, 90, 70);
+        }
+
+        // Decoración nivel 2
+        if (nivel == 2) {
+            shapeRenderer.setColor(0.18f, 0.06f, 0.06f, 1);
+            shapeRenderer.rect(170, 150, 160, 35);
+            shapeRenderer.rect(450, 360, 180, 35);
+
+            shapeRenderer.setColor(0.12f, 0.04f, 0.16f, 1);
+            shapeRenderer.rect(90, 400, 100, 90);
+            shapeRenderer.rect(560, 90, 120, 90);
+        }
+    }
+
+    private void drawGame() {
+        camera.update();
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+
+        drawTileBackground();
 
         if (keyVisible) {
             if (nivel == 1) {
@@ -327,5 +398,6 @@ public class GameScreen implements Screen {
         chaserEnemy.dispose();
         coinTexture.dispose();
         treasureTexture.dispose();
+        floorTexture.dispose();
     }
 }
