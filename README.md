@@ -1,33 +1,80 @@
 # Dungeibone
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+Dungeibone es un videojuego 2D desarrollado en Java con libGDX para la asignatura de Programación Multimedia y Dispositivos Móviles.
 
-This project was generated with a template including simple application launchers and a main class extending `Game` that sets the first screen.
+## Objetivo del juego
 
-## Platforms
+El jugador debe avanzar por diferentes mazmorras, recoger todos los objetos necesarios de cada nivel y llegar a la bandera para pasar al siguiente nivel.
 
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
+Al completar el nivel 4, se muestra la pantalla de victoria.
 
-## Gradle
+## Controles
 
-This project uses [Gradle](https://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
+- Flechas o WASD: mover al personaje.
+- P: abrir o cerrar el menú de pausa.
+- Arriba / Abajo: moverse por el menú de pausa.
+- Enter: seleccionar una opción del menú de pausa.
 
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
+## Características principales
 
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+- Juego 2D desarrollado con libGDX.
+- Personaje principal controlable.
+- 4 niveles diferentes.
+- Objetos coleccionables por nivel.
+- HUD con vida, puntos, nivel actual y objetos recogidos.
+- Menú principal.
+- Pantalla de instrucciones.
+- Pantalla de opciones.
+- Pantalla de victoria.
+- Pantalla de game over.
+- Menú de pausa durante la partida.
+- Música de fondo y efectos de sonido.
+- Dificultad configurable: fácil, normal y difícil.
+- Sonido configurable.
+- NPCs/enemigos diferentes:
+  - StaticEnemy.
+  - EnemyPatrol.
+  - EnemyChaser.
+- IA simple en EnemyChaser, que persigue al jugador.
+
+## Requisitos cumplidos
+
+### Requisitos obligatorios
+
+- Personaje principal, inicio, final y objetivo claro.
+- Al menos dos niveles claramente diferenciados.
+- Información en pantalla: puntuación, vida y nivel actual.
+- Menús para iniciar, configurar, terminar e instrucciones.
+- Dos opciones configurables: sonido y dificultad.
+- Al menos 3 NPCs diferentes.
+- Sonido y animaciones en personajes con movimiento.
+
+### Funcionalidades opcionales implementadas
+
+- Repositorio en GitHub con issues, release y documentación.
+- IA simple en un NPC mediante EnemyChaser.
+- Menú de pausa durante la partida.
+- Dos niveles adicionales, pasando de 2 a 4 niveles.
+
+## Tecnologías utilizadas
+
+- Java.
+- libGDX.
+- Gradle.
+- IntelliJ IDEA.
+- Git y GitHub.
+
+## Estructura del proyecto
+
+- `core`: módulo principal con la lógica del videojuego.
+- `lwjgl3`: módulo de escritorio para ejecutar el juego en PC.
+- `assets`: carpeta con imágenes, fuentes y sonidos del juego.
+
+## Ejecución del proyecto
+
+El proyecto se puede ejecutar desde IntelliJ IDEA usando la configuración de escritorio/lwjgl3.
+
+También se puede ejecutar desde terminal con Gradle:
+
+```bash
+./gradlew lwjgl3:run
