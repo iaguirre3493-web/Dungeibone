@@ -194,14 +194,12 @@ public class FirstScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        // Menu
         font.getData().setScale(0.50f);
         drawCenteredCleanLine("ENTER - Iniciar partida", 325);
         drawCenteredCleanLine("I - Instrucciones", 290);
         drawCenteredCleanLine("O - Opciones", 255);
         drawCenteredCleanLine("ESC - Salir", 220);
 
-        // Texto inferior
         font.getData().setScale(0.42f);
         drawCenteredCleanLine("Recoge monedas, consigue el tesoro", 112);
         drawCenteredCleanLine("y alcanza la bandera", 88);
